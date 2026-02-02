@@ -1,0 +1,200 @@
+import { useState, useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import styles from './Panels.module.css'
+import { api } from '../../../components/components-internetShop/axios-shopUser'
+import { fetchUsersList } from '../../../actions'
+
+export const AdminPanel = () => {
+  const users = useSelector(
+    s => s.authUserShopState.usersList
+  )
+  const dispatch = useDispatch()
+
+  const [menu, setMenu] = useState(null)
+  const [time, setTime] = useState('')
+  const [reason, setReason] = useState('')
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    dispatch(fetchUsersList())
+  }, [dispatch])
+
+  useEffect(() => {
+    const close = e => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
+        setMenu(null)
+      }
+    }
+
+    document.addEventListener('click', close)
+    return () =>
+      document.removeEventListener('click', close)
+  }, [])
+
+  const openMenu = (e, user) => {
+    e.stopPropagation()
+    setMenu({
+      x: e.pageX,
+      y: e.pageY,
+      user
+    })
+    setTime('')
+    setReason('')
+  }
+
+  const applyPunishment = type => {
+    const until =
+      time === 'permanent'
+        ? 'permanent'
+        : Date.now() + Number(time) * 60000
+
+    api.post(`/users/punish/${menu.user.id}`, {
+      type,
+      until,
+      reason
+    })
+
+    setMenu(null)
+  }
+
+  return (
+    <div className={styles.panel}>
+      <h2 className={styles.title}>🛡 Admin Panel</h2>
+
+      {users
+        .filter(u => u.role === 'user')
+        .map(u => (
+          <div
+            key={u.id}
+            className={styles.userRow}
+            onClick={e => openMenu(e, u)}
+          >
+            {u.login}
+          </div>
+        ))}
+
+      {menu && (
+        <div
+          ref={menuRef}
+          className={styles.contextMenu}
+          style={{ top: menu.y, left: menu.x }}
+        >
+          <input
+            placeholder="Время (мин / permanent)"
+            value={time}
+            onChange={e => setTime(e.target.value)}
+          />
+
+          <textarea
+            placeholder="Причина"
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+          />
+
+          <button
+            className={styles.shopBtnDanger}
+            onClick={() => applyPunishment('ban')}
+          >
+            🚫 Бан
+          </button>
+
+          <button
+            className={styles.shopBtnDark}
+            onClick={() => applyPunishment('mute')}
+          >
+            🔇 Мут
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/*import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
+import styles from './Panels.module.css'
+import { fetchUsersList } from '../../../actions'
+
+const authHeader = () => ({
+  Authorization: `Bearer ${
+    localStorage.getItem('token') ||
+    sessionStorage.getItem('token')
+  }`
+})
+
+export const AdminPanel = () => {
+  const users = useSelector(
+    s => s.authUserShopState.usersList
+  )
+  const dispatch = useDispatch()
+
+  const [menu, setMenu] = useState(null)
+  const [time, setTime] = useState('')
+  const [reason, setReason] = useState('')
+
+  useEffect(() => {
+    dispatch(fetchUsersList())
+  }, [dispatch])
+
+  const applyPunishment = type => {
+    const until =
+      time === 'permanent'
+        ? 'permanent'
+        : Date.now() + Number(time) * 60000
+
+    axios.post(
+      `http://localhost:2026/api/users/punish/${menu.user.id}`,
+      { type, until, reason },
+      { headers: authHeader() }
+    )
+
+    setMenu(null)
+  }
+
+  return (
+    <div className={styles.panel}>
+      <h2>🛡 Admin Panel</h2>
+
+      {users
+        .filter(u => u.role === 'user')
+        .map(u => (
+          <div
+            key={u.id}
+            onContextMenu={e => {
+              e.preventDefault()
+              setMenu({ x: e.pageX, y: e.pageY, user: u })
+            }}
+          >
+            {u.login}
+          </div>
+        ))}
+
+      {menu && (
+        <div style={{ top: menu.y, left: menu.x }}>
+          <input
+            value={time}
+            onChange={e => setTime(e.target.value)}
+            placeholder="мин / permanent"
+          />
+          <textarea
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+          />
+          <button onClick={() => applyPunishment('ban')}>
+            Бан
+          </button>
+          <button onClick={() => applyPunishment('mute')}>
+            Мут
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+*/
+
+
