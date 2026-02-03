@@ -22,7 +22,7 @@ api.interceptors.request.use(config => {
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL
 })
 
 
