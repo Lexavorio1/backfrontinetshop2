@@ -5,7 +5,7 @@ import { AddTodoListForm, Search } from '../../forms'
 import styles from './App-main.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useIsMobile, FullTextModal } from "../../mobile"
+import { useIsMobile, FullTextModal } from "../../Mobile"
 
 export const AppTodos = () => {
   const dispatch = useDispatch()
