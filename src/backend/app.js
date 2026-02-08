@@ -19,14 +19,7 @@ const routes = require('./routes')
 
 const app = express()
 
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://backfrontinetshop.vercel.app',
-    'https://backfrontinetshop2.onrender.com',
-  ],
-  credentials: true
-}))
+app.use(cors())
 
 app.use(express.json())
 
