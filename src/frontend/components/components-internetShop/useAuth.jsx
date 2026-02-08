@@ -30,8 +30,8 @@ export const useAuth = () => {
     const storage = remember ? localStorage : sessionStorage
     const other = remember ? sessionStorage : localStorage
 
-    storage.setItem('token', JSON.stringify(userData))
-    other.removeItem('token')
+    storage.setItem('authUser', JSON.stringify(userData))
+    other.removeItem('authUser')
   }
 
   /* ===== LOGOUT ===== */
